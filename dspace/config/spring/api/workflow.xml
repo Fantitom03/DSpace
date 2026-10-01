@@ -23,25 +23,26 @@
                          value='file:${dspace.dir}/config/workflow-curation.xml'/>
     </bean>
 
-    <!--Standard DSpace workflow-->
+    <!-- Standard DSpace workflow: Circuito institucional de 3 etapas -->
     <bean name="defaultWorkflow" class="org.dspace.xmlworkflow.state.Workflow">
         <property name="firstStep" ref="reviewstep"/>
         <property name="steps">
             <util:list>
                 <ref bean="reviewstep"/>
-                <ref bean="editstep"/>
+                <ref bean="editorstep"/>
                 <ref bean="finaleditstep"/>
             </util:list>
         </property>
     </bean>
 
+    <!-- ETAPA 1: Revisión Inicial -->
     <bean name="reviewstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
         <property name="role" ref="reviewer"/>
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
-                       value-ref="editstep"/>
+                       value-ref="editorstep"/>
             </util:map>
         </property>
         <property name="actions">
@@ -55,10 +56,11 @@
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Reviewer"/>
         <property name="description"
-                  value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
+                  value="Responsables de revisar metadatos de envíos entrantes, pudiendo aceptar o rechazar."/>
     </bean>
 
-    <bean name="editstep" class="org.dspace.xmlworkflow.state.Step">
+    <!-- ETAPA 2: Revisión de Contenidos y Edición -->
+    <bean name="editorstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
         <property name="role" ref="editor" />
         <property name="outcomes">
@@ -73,14 +75,16 @@
             </list>
         </property>
     </bean>
+    <alias name="editorstep" alias="editstep"/>
 
     <bean id="editor" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Editor"/>
         <property name="description"
-                  value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
+                  value="Responsables de editar y validar contenidos de los envíos."/>
     </bean>
 
+    <!-- ETAPA 3: Edición Final previa al Archivo Definitivo -->
     <bean name="finaleditstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
         <property name="role" ref="finaleditor" />
@@ -95,7 +99,7 @@
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Final Editor"/>
         <property name="description"
-                  value="The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them."/>
+                  value="Responsables de corregir metadatos in-situ previo al ingreso automático en el repositorio (archive)."/>
     </bean>
 
     <!--Workflow where a reviewManager can select a single review who will then either accept/reject the item-->
